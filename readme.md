@@ -15,6 +15,42 @@ An example is to hook the DHT22 up to GPIO23 and the vcc up to 3.3v at PIN 1 and
 
 Once the device is hooked up to the Raspberry PI there are 2 different ways to run the pi-iot software.  1 option is to use the command line and the other is to use docker.
 
+### Variables
+
+variables are defined as follows
+
+##### -p <pin>
+
+The GPIO pin that has the sensor attached.
+
+##### -s <source>
+
+The source that will be used on the metric that is posted.
+
+##### -t <type>
+
+This field is for the type of sensor, current possible values are `DHT11` or `DHT22`.  The default value is `DHT22`.
+
+##### -w <webhook>
+
+Optional parameter for the url/webhook that the metrics should be sent to as a post.
+
+##### -m <metric>
+
+Optional parameter for the prefix to the metric that will be posted.
+
+##### -o <output>
+
+This is optional variable that will determine if the metric should be in the Wavefront format.  To have Wavefront format the output needs to be set to `WF`.
+
+##### -f <format>
+
+The optional format is `f` to have temperature returned in Fahrenheit or `c` or default for Celsius.
+
+##### -d <delay>
+
+Optional parameter that will adjust the delay of the metric measured by seconds.  The default is 1 second.
+
 ### Command line
 
 #### Download
