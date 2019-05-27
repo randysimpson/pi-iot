@@ -78,6 +78,19 @@ def run(delay, sensor, pin, webhook, source, metric_prefix, output, format):
         else:
             print(result)
 
+def formatArgs(sentArgs):
+   argList = []
+   sentArgs = sys.argv[1:]
+   for i, arg in enumerate(sentArgs):
+      if i + 1 < len(sentArgs):
+         nextElement = sentArgs[(i+1) % len(sentArgs)]
+         if (nextElement.startswith("-") and arg.startswith("-")) is False:
+            argList.append(arg)
+      else:
+         if not arg.startswith("-"):
+            argList.append(arg)
+   return argList
+
 def main(argv):
    iot_type = 'DHT22'
    webhook = None
@@ -115,4 +128,5 @@ def main(argv):
    run(delay, iot_type, pin, webhook, source, metric_prefix, output, format)
 
 if __name__ == "__main__":
-   main(sys.argv[1:])
+   argList = formatArgs(sys.argv[1:])
+   main(argList)

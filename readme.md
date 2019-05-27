@@ -19,35 +19,35 @@ Once the device is hooked up to the Raspberry PI there are 2 different ways to r
 
 variables are defined as follows
 
-##### -p <pin>
+##### -p or --pin
 
 The GPIO pin that has the sensor attached.
 
-##### -s <source>
+##### -s or --source
 
 The source that will be used on the metric that is posted.
 
-##### -t <type>
+##### -t or --type
 
 This field is for the type of sensor, current possible values are `DHT11` or `DHT22`.  The default value is `DHT22`.
 
-##### -w <webhook>
+##### -w or --webhook
 
 Optional parameter for the url/webhook that the metrics should be sent to as a post.
 
-##### -m <metric>
+##### -m or --metric
 
 Optional parameter for the prefix to the metric that will be posted.
 
-##### -o <output>
+##### -o or --output
 
 This is optional variable that will determine if the metric should be in the Wavefront format.  To have Wavefront format the output needs to be set to `WF`.
 
-##### -f <format>
+##### -f or --format
 
 The optional format is `f` to have temperature returned in Fahrenheit or `c` or default for Celsius.
 
-##### -d <delay>
+##### -d or --delay
 
 Optional parameter that will adjust the delay of the metric measured by seconds.  The default is 1 second.
 
