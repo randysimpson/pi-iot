@@ -101,7 +101,7 @@ python3 pi-iot.py -p 23 -s backyard -w "http://wfproxy:3878/" -m "IOT" -o WF -f 
 For docker to be able to access the GPIO pins the container must be run with the --privileged argument.
 
 ```sh
-docker run -ti --privileged -e "pin=23" -e "type=DHT22" -e "source=backyard" -e "format=f" pi-iot:1.0
+docker run -ti --privileged -e "pin=23" -e "type=DHT22" -e "source=backyard" -e "format=f" randysimpson/pi-iot:1.0
 ```
 
 ### Kubernetes
@@ -115,7 +115,7 @@ metadata:
 spec:
   containers:
   - name: pi-iot
-    image: pi-iot:1.0
+    image: randysimpson/pi-iot:1.0
     imagePullPolicy: IfNotPresent
     env:
     - name: pin
@@ -128,6 +128,8 @@ spec:
       value: "http://wfproxy:3878/"
     - name: format
       value: "f"
+    - name: output
+      value: "WF"
     securityContext:
       privileged: true
   nodeSelector:
