@@ -14,9 +14,9 @@ You can hook up the DHT11 or DHT22 device to a GPIO pin.
 
 An example is to hook the DHT22 up to GPIO23 and the vcc up to 3.3v at PIN 1 and ground at PIN 14.  Please see the image below:
 
-![alt text](https://github.com/randysimpson/pi-iot/images/pi.png "Raspberry Pi wiring")
+![alt text](https://github.com/randysimpson/pi-iot/blob/master/images/pi.png "Raspberry Pi wiring")
 
-![alt text](https://github.com/randysimpson/pi-iot/images/dht22.png "DHT 22 Temp sensor")
+![alt text](https://github.com/randysimpson/pi-iot/blob/master/images/dht22.PNG "DHT 22 Temp sensor")
 
 Once the device is hooked up to the Raspberry PI there are 2 different ways to run the pi-iot software.  1 option is to use the command line and the other is to use docker.
 
