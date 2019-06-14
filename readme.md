@@ -1,6 +1,7 @@
 # pi-iot
 
 ** This is not an official wavefront package. **
+
 This package can be used to get metrics from a Raspberry PI 3 device with a DHT11 or DHT22 device attached to a GPIO pin.
 
 ## Optional Wavefront Integration
@@ -12,6 +13,10 @@ For this package to send metrics to [Wavefront](https://wavefront.com) there wil
 You can hook up the DHT11 or DHT22 device to a GPIO pin.
 
 An example is to hook the DHT22 up to GPIO23 and the vcc up to 3.3v at PIN 1 and ground at PIN 14.  Please see the image below:
+
+![alt text](https://github.com/randysimpson/pi-iot/images/pi.png "Raspberry Pi wiring")
+
+![alt text](https://github.com/randysimpson/pi-iot/images/dht22.png "DHT 22 Temp sensor")
 
 Once the device is hooked up to the Raspberry PI there are 2 different ways to run the pi-iot software.  1 option is to use the command line and the other is to use docker.
 
