@@ -14,7 +14,7 @@ You can hook up the DHT11 or DHT22 device to a GPIO pin.
 
 An example is to hook the DHT22 up to GPIO23 and the vcc up to 3.3v at PIN 1 and ground at PIN 14.  Please see the image below:
 
-![alt text](https://github.com/randysimpson/pi-iot/blob/master/images/pi.png "Raspberry Pi wiring")
+![alt text](https://github.com/randysimpson/pi-iot/blob/master/images/pi.PNG "Raspberry Pi wiring")
 
 ![alt text](https://github.com/randysimpson/pi-iot/blob/master/images/dht22.PNG "DHT 22 Temp sensor")
 
@@ -68,7 +68,7 @@ git clone https://gitbub.com/randysimpson/pi-iot.git
 
 #### Prerequisites
 
-The package will only work if the Adafruit_DHT library is installed.  To install the Adafruit_DHT package please download the code by using:
+If you are not using Docker or Kubernetes then you must install the Adafruit_DHT library.  To install the Adafruit_DHT package please download the code by using:
 
 ```sh
 git clone https://github.com/adafruit/Adafruit_Python_DHT.git
@@ -81,7 +81,7 @@ cd Adafruit_Python_DHT
 python3 setup.py install
 ```
 
-#### Examples
+#### pi-iot Examples
 
 Example:
 
