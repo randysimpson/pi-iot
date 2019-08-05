@@ -1,82 +1,39 @@
 #!/usr/bin/python3
+'''
+Copyright (©) 2019 - Randall Simpson
+pi-iot
 
+This class is used to run the pi-iot app for gathering and sending metrics from a raspberry pi.
+'''
 import sys, getopt
-import Adafruit_DHT
 import time
-import datetime
 import requests
+import os
+from temp import Temp
+from host import Host
 
-def getInfo(sensor, pin, format):
-    date = datetime.datetime.utcnow()
-    humidity, temp = Adafruit_DHT.read_retry(sensor, pin)
-    if temp is not None:
-        result = {}
-        result['date'] = date
-        result['humidity'] = humidity
-        if format == 'f':
-            result['temperature'] = (temp * 9/5) + 32
-        else:
-            result['temperature'] = temp
-        return result
+def run(delay, sensor_type, pin, webhook, source, metric_prefix, output, format):
+    sensor = None
+    if sensor_type.startswith('DHT'):
+        sensor = Temp(source, metric_prefix, output, sensor_type, pin, format)
     else:
-        return None
+        sensor = Host(source, metric_prefix, output)
 
-def formatMetric(result, pin, sensor, source, metric_prefix):
-    tags = {}
-    tags['pin'] = pin
-    tags['sensor'] = sensor
-    humidity = {}
-    humidity['date'] = result['date'].isoformat() + 'Z'
-    humidity['metric'] = metric_prefix + 'humidity'
-    humidity['value'] = result['humidity']
-    humidity['tags'] = tags
-    humidity['source'] = source
-    temp = {}
-    temp['date'] = result['date'].isoformat() + 'Z'
-    temp['metric'] = metric_prefix + 'temperature'
-    temp['value'] = result['temperature']
-    temp['tags'] = tags
-    temp['source'] = source
-    metrics = [ humidity, temp ]
-    return metrics
-
-def formatWFMetric(value, tags, name):
-    detail = {}
-    detail['value'] = value
-    detail['tags'] = tags
-    metric = {}
-    metric[name] = detail
-    return metric
-
-def formatWFTags(pin, sensor):
-    tags = {}
-    tags['Pin'] = pin
-    tags['Sensor'] = sensor
-    return tags
-
-def run(delay, sensor, pin, webhook, source, metric_prefix, output, format):
-    code = Adafruit_DHT.DHT22
-    if sensor == 'DHT11':
-        code = Adafruit_DHT.DHT11
     while True:
-        time.sleep(delay)
-        result = getInfo(code, pin, format)
+        metrics = sensor.get_info()
         if webhook is not None:
             try:
                 if output == 'WF':
-                    tags = formatWFTags(pin, sensor)
-                    humidity = formatWFMetric(result['humidity'], tags, metric_prefix + '.Humidity')
-                    temp = formatWFMetric(result['temperature'], tags, metric_prefix + '.Temperature')
-                    path = webhook + "?h=" + source + "&d=%d" % (result['date'].timestamp())
-                    requests.post(path, json=humidity)
-                    requests.post(path, json=temp)
+                    path = webhook + "?h=" + source
+                    for metric in metrics:
+                        requests.post(path + "&d=%d" % (metric['date'].timestamp()), json=metric)
                 else:
-                    metrics = formatMetric(result, pin, sensor, source, metric_prefix)
                     requests.post(webhook, json=metrics)
             except requests.exceptions.ConnectionError:
                 print('Connection error to webhook %s' % (webhook))
         else:
-            print(result)
+            print(metrics)
+        time.sleep(delay)
 
 def formatArgs(sentArgs):
    argList = []
@@ -92,18 +49,22 @@ def formatArgs(sentArgs):
    return argList
 
 def main(argv):
-   iot_type = 'DHT22'
+   iot_type = 'HOST'
    webhook = None
    source = ''
    metric_prefix = ''
    output = None
    format = 'c'
-   delay = 1
+   delay = 60
+   pin = -1
    try:
       opts, args = getopt.getopt(argv,"hp:t:w:s:m:o:f:d:",["pin=","type=","webhook=","source=","metric=", "output=", "format=", "delay="])
    except getopt.GetoptError:
       print('pi-iot.py -p <pin> -t <type> -w <webhook> -s <source> -m <metric> -o <output> -f <format> -d <delay>')
       sys.exit(2)
+   #set default delay for non host metrics to 1 second.
+   if "-p" in args or "--pin" in args:
+       delay = 1
    for opt, arg in opts:
       if opt == '-h':
          print('pi-iot.py -p <pin> -t <type> -w <webhook> -s <source> -m <metric> -o <output> -f <format> -d <delay>')
@@ -125,6 +86,9 @@ def main(argv):
       elif opt in ("-d", "--delay"):
           delay = arg
    #print('pin is %d and type is %s and webhook is %s and source is %s' % (pin, iot_type, webhook, source))
+   #check if source was setup.
+   if len(source) < 1:
+       source = os.popen('hostname').read().replace("\n", "")
    run(delay, iot_type, pin, webhook, source, metric_prefix, output, format)
 
 if __name__ == "__main__":
