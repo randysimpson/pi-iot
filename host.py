@@ -72,7 +72,11 @@ class Host(Sensor):
         i = 0
         if len(data[0]) > 2:
             uptime = int(data[i][2]) * 24 * 60
-            uptime += self.convertDurationToInt(data[i][4])
+            if len(data[i]) > 4:
+                uptime += self.convertDurationToInt(data[i][4])
+            else:
+                i+=1
+                uptime += self.convertDurationToInt(data[i][0])
         else:
             i+= 1
             uptime += self.convertDurationToInt(data[i][0])
