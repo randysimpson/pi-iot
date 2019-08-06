@@ -35,7 +35,10 @@ class Host(Sensor):
                 data[i].insert(0, '')
             else:
                 #remove the ":"
-                data[i][0] = data[i][0][:-1]
+                if not data[i][0].endswith(":"):
+                    #then 0 and 1 should be combined.
+                    del data[i][0]
+                data[i][0] = data[i][0][:-1].replace("/", "_")
                 colLength = len(data[i])
                 for c in range(colLength):
                     if c > 0:
@@ -66,26 +69,33 @@ class Host(Sensor):
             data[i] = list(filter(None, data[i].split(' ')))
         #check if uptime has days
         uptime = 0
+        i = 0
         if len(data[0]) > 2:
-            uptime = int(data[0][2]) * 24 * 60 * 60
-            uptime += self.convertDurationToInt(data[0][4])
+            uptime = int(data[i][2]) * 24 * 60
+            uptime += self.convertDurationToInt(data[i][4])
         else:
-            uptime += self.convertDurationToInt(data[0][2])
+            i+= 1
+            uptime += self.convertDurationToInt(data[i][0])
         self.metrics.append(Metric("uptime", uptime, date))
+        i+=1
         #users
-        users = int(data[1][0])
+        users = int(data[i][0])
         self.metrics.append(Metric("users", users, date))
+        i+=1
         #load
-        minMean = float(data[2][2])
-        fiveMinMean = float(data[2][3])
-        fifteenMean = float(data[2][4])
+        minMean = float(data[i][2])
+        fiveMinMean = float(data[i][3])
+        fifteenMean = float(data[i][4])
         self.metrics.append(Metric("load1min.mean", minMean, date))
         self.metrics.append(Metric("load5min.mean", fiveMinMean, date))
         self.metrics.append(Metric("load15min.mean", fifteenMean, date))
 
     def convertDurationToInt(self, duration):
         items = duration.split(":")
-        return (int(items[0]) * 60) + int(items[1])
+        if len(items) > 1:
+            return (int(items[0]) * 60) + int(items[1])
+        else:
+            return int(items[0])
 
     def convertStringToList(self, data):
         data = data.splitlines()
