@@ -68,7 +68,6 @@ class Host(Sensor):
         for i in range(len(data)):
             data[i] = list(filter(None, data[i].split(' ')))
         #check if uptime has days
-        print(data)
         uptime = 0
         i = 0
         if len(data[0]) > 3:
