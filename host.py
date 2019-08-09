@@ -68,9 +68,10 @@ class Host(Sensor):
         for i in range(len(data)):
             data[i] = list(filter(None, data[i].split(' ')))
         #check if uptime has days
+        print(data)
         uptime = 0
         i = 0
-        if len(data[0]) > 2:
+        if len(data[0]) > 3:
             uptime = int(data[i][2]) * 24 * 60
             if len(data[i]) > 4:
                 uptime += self.convertDurationToInt(data[i][4])
@@ -78,7 +79,6 @@ class Host(Sensor):
                 i+=1
                 uptime += self.convertDurationToInt(data[i][0])
         else:
-            i+= 1
             uptime += self.convertDurationToInt(data[i][0])
         self.metrics.append(Metric("uptime", uptime, date))
         i+=1
