@@ -65,8 +65,12 @@ class Host(Sensor):
 
     def convertUptime(self, data, date):
         data = list(data.replace(",", "").split('  '))
-        for i in range(len(data)):
-            data[i] = list(filter(None, data[i].split(' ')))
+        if len(data) > 1:
+            for i in range(len(data)):
+                data[i] = list(filter(None, data[i].split(' ')))
+        else:
+            data = list(filter(None, data[0].split(' ')))
+            data = [[data[0], data[1]], [data[2]], [data[4], data[5]], [data[6], data[7], data[8], data[9], data[10]]]
         #check if uptime has days
         uptime = 0
         i = 0

@@ -11,11 +11,16 @@ import requests
 import os
 from temp import Temp
 from host import Host
+from distance import Distance
 
 def run(delay, sensor_type, pin, webhook, source, metric_prefix, output, format):
     sensor = None
     if sensor_type.startswith('DHT'):
+        pin = int(pin)
         sensor = Temp(source, metric_prefix, output, sensor_type, pin, format)
+    elif sensor_type == 'HC-SRO':
+        pins = pin.split(',')
+        sensor = Distance(source, metric_prefix, output, sensor_type, int(pins[0]), int(pins[1]), format)
     else:
         sensor = Host(source, metric_prefix, output)
 
@@ -70,7 +75,7 @@ def main(argv):
          print('pi-iot.py -p <pin> -t <type> -w <webhook> -s <source> -m <metric> -o <output> -f <format> -d <delay>')
          sys.exit()
       elif opt in ("-p", "--pin"):
-         pin = int(arg)
+         pin = arg
       elif opt in ("-s", "--source"):
          source = arg
       elif opt in ("-w", "--webhook"):

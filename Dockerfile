@@ -17,6 +17,8 @@ WORKDIR /app/Adafruit_Python_DHT
 
 RUN python3 setup.py install
 
+RUN pip3 install RPi.GPIO
+
 COPY . /app/
 
 WORKDIR /app
