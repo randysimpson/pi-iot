@@ -80,13 +80,20 @@ class Host(Sensor):
             i+=1
             uptime += self.convertDurationToInt(data[i][0])
         else:
-            #days
-            uptime = int(data[i][2]) * 24 * 60
-            if(len(data[i]) > 5):
-                #minutes
-                uptime += int(data[i][4])
+            if len(data) == 3:
+                if len(data[i]) == 5:
+                    uptime = int(data[i][2]) * 24 * 60
+                    uptime += self.convertDurationToInt(data[i][4])
+                else:
+                    uptime += self.convertDurationToInt(data[i][2])
             else:
-                uptime += self.convertDurationToInt(data[i][4])
+                #days
+                uptime = int(data[i][2]) * 24 * 60
+                if(len(data[i]) > 5):
+                    #minutes
+                    uptime += int(data[i][4])
+                else:
+                    uptime += self.convertDurationToInt(data[i][4])
         self.metrics.append(Metric("uptime", uptime, date))
         i+=1
         #users
