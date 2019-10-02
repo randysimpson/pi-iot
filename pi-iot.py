@@ -94,6 +94,9 @@ def main(argv):
    #check if source was setup.
    if len(source) < 1:
        source = os.popen('hostname').read().replace("\n", "")
+   #ensure that the delay is an int.
+   if type(delay) == str:
+       delay = int(delay)
    run(delay, iot_type, pin, webhook, source, metric_prefix, output, format)
 
 if __name__ == "__main__":
