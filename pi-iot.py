@@ -60,7 +60,8 @@ def main(argv):
    metric_prefix = ''
    output = None
    format = 'c'
-   delay = 60
+   default_delay = 60
+   delay = None
    pin = -1
    try:
       opts, args = getopt.getopt(argv,"hp:t:w:s:m:o:f:d:",["pin=","type=","webhook=","source=","metric=", "output=", "format=", "delay="])
@@ -68,14 +69,13 @@ def main(argv):
       print('pi-iot.py -p <pin> -t <type> -w <webhook> -s <source> -m <metric> -o <output> -f <format> -d <delay>')
       sys.exit(2)
    #set default delay for non host metrics to 1 second.
-   if "-p" in args or "--pin" in args:
-       delay = 1
    for opt, arg in opts:
       if opt == '-h':
          print('pi-iot.py -p <pin> -t <type> -w <webhook> -s <source> -m <metric> -o <output> -f <format> -d <delay>')
          sys.exit()
       elif opt in ("-p", "--pin"):
          pin = arg
+         default_delay = 1
       elif opt in ("-s", "--source"):
          source = arg
       elif opt in ("-w", "--webhook"):
@@ -95,7 +95,9 @@ def main(argv):
    if len(source) < 1:
        source = os.popen('hostname').read().replace("\n", "")
    #ensure that the delay is an int.
-   if type(delay) == str:
+   if delay is None:
+       delay = default_delay
+   elif type(delay) == str:
        delay = int(delay)
    run(delay, iot_type, pin, webhook, source, metric_prefix, output, format)
 

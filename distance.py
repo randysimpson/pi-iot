@@ -14,7 +14,7 @@ import time
 class Distance(Sensor):
     def __init__(self, source, metric_prefix, output, code, pin_trigger, pin_echo, format):
         Sensor.__init__(self, source, metric_prefix, output)
-        
+
         self.pin_trigger = pin_trigger
         self.pin_echo = pin_echo
         self.format = format
@@ -27,6 +27,10 @@ class Distance(Sensor):
         GPIO.output(pin_trigger, GPIO.LOW)
         #allow pins to initialize
         time.sleep(2)
+
+    def __del__(self):
+        #destructor to clean up Pins.
+        GPIO.cleanup()
 
     def get_info(self):
         try:
@@ -44,7 +48,8 @@ class Distance(Sensor):
             pulse_duration = pulse_end_time - pulse_start_time
 
             distance = round(pulse_duration * 17150, 2)
-        finally:
+        except Exception as e:
+            print(e)
             GPIO.cleanup()
 
         if distance is not None:
@@ -58,6 +63,7 @@ class Distance(Sensor):
             if self.format == 'i':
                 distance = distance / 30.48 * 12;
             self.metrics.append(Metric(name, distance, date))
+            return self.format_metrics()
         else:
             return None
 
