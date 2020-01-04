@@ -19,20 +19,31 @@ class Distance(Sensor):
         self.pin_echo = pin_echo
         self.format = format
         self.tag_label = code
-        #init pins
-        GPIO.setmode(GPIO.BOARD)
-        GPIO.setup(pin_trigger, GPIO.OUT)
-        GPIO.setup(pin_echo, GPIO.IN)
-
-        GPIO.output(pin_trigger, GPIO.LOW)
-        #allow pins to initialize
-        time.sleep(2)
+        self.initPins()
 
     def __del__(self):
         #destructor to clean up Pins.
         GPIO.cleanup()
 
+    def initPins(self):
+        #init pins
+        GPIO.setmode(GPIO.BOARD)
+        GPIO.setup(self.pin_trigger, GPIO.OUT)
+        GPIO.setup(self.pin_echo, GPIO.IN)
+
+        GPIO.output(self.pin_trigger, GPIO.LOW)
+        #allow pins to initialize
+        time.sleep(2)
+
+    def reset(self):
+        #clean up first
+        try:
+            GPIO.cleanup()
+        finally:
+            self.initPins()
+
     def get_info(self):
+        distance = None
         try:
             date = datetime.datetime.utcnow()
 
@@ -50,7 +61,7 @@ class Distance(Sensor):
             distance = round(pulse_duration * 17150, 2)
         except Exception as e:
             print(e)
-            GPIO.cleanup()
+            self.reset()
 
         if distance is not None:
             name = self.metric_prefix + 'distance'
