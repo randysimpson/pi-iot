@@ -38,9 +38,6 @@ class Temp(Sensor):
                 if len(self.metric_prefix) > 0:
                     name = self.metric_prefix + '.' + name
             self.metrics.append(Metric(name, temp, date))
-            return self.format_metrics()
-        else:
-            return None
 
     def format_metrics(self):
         rtnMetrics = []

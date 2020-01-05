@@ -74,9 +74,6 @@ class Distance(Sensor):
             if self.format == 'i':
                 distance = distance / 30.48 * 12;
             self.metrics.append(Metric(name, distance, date))
-            return self.format_metrics()
-        else:
-            return None
 
     def format_metrics(self):
         rtnMetrics = []

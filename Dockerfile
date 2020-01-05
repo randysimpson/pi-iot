@@ -1,14 +1,8 @@
-FROM resin/rpi-raspbian:latest
+FROM randysimpson/alpine-rpigpio:armv71
 
-RUN apt-get -q update \
-  && apt-get upgrade -qy \
-  && apt-get -y install \
-    python3 \
-    python3-setuptools \
-    build-essential \
-    python3-dev \
-    python3-pip \
-    git
+RUN apk add --no-cache --purge -uU git python3-dev gcc linux-headers musl-dev
+
+RUN pip3 install requests
 
 WORKDIR /app
 RUN git clone https://github.com/adafruit/Adafruit_Python_DHT.git
@@ -16,8 +10,6 @@ RUN git clone https://github.com/adafruit/Adafruit_Python_DHT.git
 WORKDIR /app/Adafruit_Python_DHT
 
 RUN python3 setup.py install
-
-RUN pip3 install RPi.GPIO
 
 COPY . /app/
 

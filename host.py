@@ -25,8 +25,6 @@ class Host(Sensor):
         self.convertDF(dfdata, date)
         self.convertUptime(uptime, date)
 
-        return self.format_metrics()
-
     def convertFree(self, data, date):
         data = self.convertStringToList(data)
         length = len(data)
@@ -64,6 +62,9 @@ class Host(Sensor):
                         self.metrics.append(metric)
 
     def convertUptime(self, data, date):
+        hasUser = False
+        if "user" in data.lower().strip():
+            hasUser = True
         data = list(data.replace(",", "").split('  '))
         if len(data) > 1:
             for i in range(len(data)):
@@ -74,7 +75,7 @@ class Host(Sensor):
         #check if uptime has days
         uptime = 0
         i = 0
-        if len(data) > 3:
+        if (hasUser and len(data) > 3) or (len(data) > 2 and not hasUser):
             if(len(data[0]) > 2):
                 uptime += int(data[i][2]) * 24 * 60
             i+=1
@@ -91,9 +92,10 @@ class Host(Sensor):
         self.metrics.append(Metric("uptime", uptime, date))
         i+=1
         #users
-        users = int(data[i][0])
-        self.metrics.append(Metric("users", users, date))
-        i+=1
+        if hasUser:
+            users = int(data[i][0])
+            self.metrics.append(Metric("users", users, date))
+            i+=1
         #load
         minMean = float(data[i][2])
         fiveMinMean = float(data[i][3])

@@ -25,7 +25,8 @@ def run(delay, sensor_type, pin, webhook, source, metric_prefix, output, format)
         sensor = Host(source, metric_prefix, output)
 
     while True:
-        metrics = sensor.get_info()
+        sensor.get_info()
+        metrics = sensor.format_metrics()
         if webhook is not None:
             try:
                 if output == 'WF':
