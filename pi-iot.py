@@ -12,6 +12,7 @@ import os
 from temp import Temp
 from host import Host
 from distance import Distance
+from sound import Sound
 
 def run(delay, sensor_type, pin, webhook, source, metric_prefix, output, format):
     sensor = None
@@ -21,6 +22,9 @@ def run(delay, sensor_type, pin, webhook, source, metric_prefix, output, format)
     elif sensor_type == 'HC-SRO':
         pins = pin.split(',')
         sensor = Distance(source, metric_prefix, output, sensor_type, int(pins[0]), int(pins[1]), format)
+    elif sensor_type == 'SSM-1':
+        pin = int(pin)
+        sensor = Sound(source, metric_prefix, output, sensor_type, pin)
     else:
         sensor = Host(source, metric_prefix, output)
 
