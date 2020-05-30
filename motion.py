@@ -2,7 +2,7 @@
 Copyright (©) 2020 - Randall Simpson
 pi-iot
 
-This class is used to gather sound sensor metrics from a raspberry pi.
+This class is used to gather motion sensor metrics from a raspberry pi.
 '''
 from sensor import Sensor
 from metric import Metric
@@ -11,15 +11,15 @@ import sys
 import RPi.GPIO as GPIO
 import time
 
-class Sound(Sensor):
+class Motion(Sensor):
     def __init__(self, source, metric_prefix, output, code, pin):
         Sensor.__init__(self, source, metric_prefix, output)
 
         self.pin = pin
         self.tag_label = code
-        self.name = self.metric_prefix + 'sound'
+        self.name = self.metric_prefix + 'motion'
         if self.output == 'WF':
-            self.name = 'Sound'
+            self.name = 'Motion'
             if len(self.metric_prefix) > 0:
                 self.name = self.metric_prefix + '.' + self.name
         self.initPins()
@@ -34,10 +34,14 @@ class Sound(Sensor):
         GPIO.setup(self.pin, GPIO.IN)
 
         #allow pin to initialize
-        time.sleep(2)
+        print("Initializing...")
+        time.sleep(60)
 
         #find initial pin value
         self.initial_value = GPIO.input(self.pin)
+        self.last_change_time = time.time()
+        self.in_motion = False
+        print("Ready")
 
     def reset(self):
         #clean up first
@@ -52,9 +56,16 @@ class Sound(Sensor):
             #do nothing, wait for a change
             current_value = GPIO.input(self.pin)
             time.sleep(0.00001)
+            pulse_end_time = time.time()
+            if self.in_motion is False and current_value == 1 and pulse_end_time - self.last_change_time > 3.7:
+                self.metrics.append(Metric(self.name, 1.0, datetime.datetime.utcnow()))
+                self.in_motion = True
         # changed
         self.initial_value = current_value
-        self.metrics.append(Metric(self.name, current_value, datetime.datetime.utcnow()))
+        self.last_change_time = time.time()
+        if current_value == 0 and self.in_motion is True:
+            self.metrics.append(Metric(self.name, 0.0, datetime.datetime.utcnow()))
+            self.in_motion = False
 
     def format_metrics(self):
         rtnMetrics = []

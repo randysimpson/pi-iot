@@ -13,37 +13,51 @@ from temp import Temp
 from host import Host
 from distance import Distance
 from sound import Sound
+from motion import Motion
+
+def send_metrics(metrics, output, webhook, source):
+    try:
+        if output == 'WF':
+            path = webhook + "?h=" + source
+            for metric in metrics:
+                requests.post(path + "&d=%d" % (metric['date'].timestamp()), json=metric)
+        else:
+            requests.post(webhook, json=metrics)
+    except requests.exceptions.ConnectionError:
+        print('Connection error to webhook %s' % (webhook))
 
 def run(delay, sensor_type, pin, webhook, source, metric_prefix, output, format):
     sensor = None
+    is_polling = False
     if sensor_type.startswith('DHT'):
         pin = int(pin)
         sensor = Temp(source, metric_prefix, output, sensor_type, pin, format)
+        is_polling = True
     elif sensor_type == 'HC-SRO':
         pins = pin.split(',')
         sensor = Distance(source, metric_prefix, output, sensor_type, int(pins[0]), int(pins[1]), format)
+        is_polling = True
     elif sensor_type == 'SSM-1':
         pin = int(pin)
         sensor = Sound(source, metric_prefix, output, sensor_type, pin)
+    elif sensor_type == 'HC-SR501':
+        pin = int(pin)
+        sensor = Motion(source, metric_prefix, output, sensor_type, pin)
     else:
         sensor = Host(source, metric_prefix, output)
+        is_polling = True
 
     while True:
         sensor.get_info()
         metrics = sensor.format_metrics()
         if webhook is not None:
-            try:
-                if output == 'WF':
-                    path = webhook + "?h=" + source
-                    for metric in metrics:
-                        requests.post(path + "&d=%d" % (metric['date'].timestamp()), json=metric)
-                else:
-                    requests.post(webhook, json=metrics)
-            except requests.exceptions.ConnectionError:
-                print('Connection error to webhook %s' % (webhook))
+            send_metrics(metrics, output, webhook, source)
         else:
             print(metrics)
-        time.sleep(delay)
+        # check if the senor is something that needs to poll for results based on a delay.
+        if is_polling:
+            time.sleep(delay)
+
 
 def formatArgs(sentArgs):
    argList = []
