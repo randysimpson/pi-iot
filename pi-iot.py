@@ -12,7 +12,7 @@ import os
 from temp import Temp
 from host import Host
 from distance import Distance
-from sound import Sound
+from generic import Generic
 from motion import Motion
 
 def send_metrics(metrics, output, webhook, source):
@@ -39,10 +39,16 @@ def run(delay, sensor_type, pin, webhook, source, metric_prefix, output, format)
         is_polling = True
     elif sensor_type == 'SSM-1':
         pin = int(pin)
-        sensor = Sound(source, metric_prefix, output, sensor_type, pin)
+        sensor = Generic(source, metric_prefix, output, sensor_type, pin, 'Sound')
     elif sensor_type == 'HC-SR501':
         pin = int(pin)
         sensor = Motion(source, metric_prefix, output, sensor_type, pin)
+    elif sensor_type == 'SEO53':
+        pin = int(pin)
+        sensor = Generic(source, metric_prefix, output, sensor_type, pin, 'Vibration')
+    elif sensor_type == 'SEO23':
+        pin = int(pin)
+        sensor = Generic(source, metric_prefix, output, sensor_type, pin, 'Tilt')
     else:
         sensor = Host(source, metric_prefix, output)
         is_polling = True

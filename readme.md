@@ -6,6 +6,8 @@ This package can be used to get metrics from a Raspberry PI 3 device.  Current m
 3. [Distance (HC-SRO)](#Distance)
 4. [Sound (SSM-1 or Funduino KY-060)](#Sound)
 5. [Motion (PIR or HC-SR501)](#Motion)
+6. [Tilt switch (IDUINO Knock SEO23)](#tilt)
+7. [Vibration sensor (SEO53)](#vibration)
 
 To ingest these metrics there needs to be a webhook available by the IOT device.  To use an ingestor that uses a mongodb backend please see [Ingestor](https://github.com/randysimpson/ingestor), another option could be to use Wavefront or some other product.
 
@@ -223,7 +225,7 @@ The [HC-SR501](https://www.allelectronics.com/mas_assets/media/allelectronics201
 
 #### Docker
 
-If the out wife is connected to pin #15 - GPIO 22:
+If the out wire is connected to pin #15 - GPIO 22:
 
 *For docker to be able to access the GPIO pins the container must be run with the --privileged argument.*
 
@@ -251,6 +253,102 @@ spec:
       value: "room"
     - name: type
       value: "HC-SR501"
+    - name: webhook
+      value: "http://wfproxy:3878/"
+    - name: format
+      value: "f"
+    - name: output
+      value: "WF"
+    securityContext:
+      privileged: true
+  nodeSelector:
+    location: room
+```
+
+### Tilt
+
+The [tilt switch sensor (SEO23)](https://www.allelectronics.com/mas_assets/media/allelectronics2018/spec/SE-23.pdf) device can be connected to GPIO pin on Raspberry Pi 3.  The `pin` parameter must contain the pin number attached to the `out` terminal.  There is also a `vcc` terminal to connect to +3 or +5, and a `GND` terminal for ground.
+
+![SEO23 - Tilt Sensor](https://github.com/randysimpson/pi-iot/blob/master/images/SEO23.PNG "SEO23 - Tilt Sensor")
+
+#### Docker
+
+If the out wire is connected to pin #15 - GPIO 22:
+
+*For docker to be able to access the GPIO pins the container must be run with the --privileged argument.*
+
+```sh
+docker run -ti --privileged -e "pin=15" -e "type=SEO23" -e "source=room" randysimpson/pi-iot:latest
+```
+
+#### Kubernetes
+
+To create a pod spec an example yaml file with a labeled node as `location=room` is given below:
+
+```json
+kind: Pod
+metadata:
+  name: pi-iot
+spec:
+  containers:
+  - name: pi-iot
+    image: randysimpson/pi-iot:latest
+    imagePullPolicy: IfNotPresent
+    env:
+    - name: pin
+      value: "15"
+    - name: source
+      value: "room"
+    - name: type
+      value: "SEO23"
+    - name: webhook
+      value: "http://wfproxy:3878/"
+    - name: format
+      value: "f"
+    - name: output
+      value: "WF"
+    securityContext:
+      privileged: true
+  nodeSelector:
+    location: room
+```
+
+### Vibration
+
+The [vibration shock module SEO53](https://www.allelectronics.com/mas_assets/media/allelectronics2018/spec/SE-53.pdf) device can be connected to GPIO pin on Raspberry Pi 3.  The `pin` parameter must contain the pin number attached to the `S` terminal.  There is also a `vcc` terminal in the middle to connect to +3 or +5, and a `-` terminal for ground.
+
+![SEO53 Vibration Sensor](https://github.com/randysimpson/pi-iot/blob/master/images/SEO53.PNG "SEO53 Vibration Sensor")
+
+#### Docker
+
+If the `S` wire is connected to pin #15 - GPIO 22:
+
+*For docker to be able to access the GPIO pins the container must be run with the --privileged argument.*
+
+```sh
+docker run -ti --privileged -e "pin=15" -e "type=SEO53" -e "source=room" randysimpson/pi-iot:latest
+```
+
+#### Kubernetes
+
+To create a pod spec an example yaml file with a labeled node as `location=room` is given below:
+
+```json
+kind: Pod
+metadata:
+  name: pi-iot
+spec:
+  containers:
+  - name: pi-iot
+    image: randysimpson/pi-iot:latest
+    imagePullPolicy: IfNotPresent
+    env:
+    - name: pin
+      value: "15"
+    - name: source
+      value: "room"
+    - name: type
+      value: "SEO53"
     - name: webhook
       value: "http://wfproxy:3878/"
     - name: format

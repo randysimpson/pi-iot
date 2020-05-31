@@ -2,7 +2,7 @@
 Copyright (©) 2020 - Randall Simpson
 pi-iot
 
-This class is used to gather sound sensor metrics from a raspberry pi.
+This class is used to gather generic sensor metrics from a raspberry pi.
 '''
 from sensor import Sensor
 from metric import Metric
@@ -11,15 +11,15 @@ import sys
 import RPi.GPIO as GPIO
 import time
 
-class Sound(Sensor):
-    def __init__(self, source, metric_prefix, output, code, pin):
+class Generic(Sensor):
+    def __init__(self, source, metric_prefix, output, code, pin, metric_name):
         Sensor.__init__(self, source, metric_prefix, output)
 
         self.pin = pin
         self.tag_label = code
-        self.name = self.metric_prefix + 'sound'
+        self.name = self.metric_prefix + metric_name.lower()
         if self.output == 'WF':
-            self.name = 'Sound'
+            self.name = metric_name
             if len(self.metric_prefix) > 0:
                 self.name = self.metric_prefix + '.' + self.name
         self.initPins()
