@@ -371,7 +371,7 @@ And when the pi is powered on there is a LED indicator for power, also sensitivi
 *For docker to be able to access the GPIO pins the container must be run with the --privileged argument.*
 
 ```sh
-docker run -ti --privileged -e "pin=4" -e "type=YL-69" -e "source=plant" randysimpson/pi-iot:latest
+docker run -ti --privileged -e "pin=7" -e "type=YL-69" -e "source=plant" randysimpson/pi-iot:latest
 ```
 
 #### Kubernetes
@@ -389,7 +389,7 @@ spec:
     imagePullPolicy: IfNotPresent
     env:
     - name: pin
-      value: "4"
+      value: "7"
     - name: source
       value: "plant"
     - name: type
