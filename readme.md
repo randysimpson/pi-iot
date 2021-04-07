@@ -6,8 +6,9 @@ This package can be used to get metrics from a Raspberry PI 3 device.  Current m
 3. [Distance (HC-SRO)](#Distance)
 4. [Sound (SSM-1 or Funduino KY-060)](#Sound)
 5. [Motion (PIR or HC-SR501)](#Motion)
-6. [Tilt switch (IDUINO Knock SEO23)](#tilt)
-7. [Vibration sensor (SEO53)](#vibration)
+6. [Tilt switch (IDUINO Knock SEO23)](#Tilt)
+7. [Vibration sensor (SEO53)](#Vibration)
+8. [Soil Moisture sensor (YL-69 Sensor and HC-38)](#Soil)
 
 To ingest these metrics there needs to be a webhook available by the IOT device.  To use an ingestor that uses a mongodb backend please see [Ingestor](https://github.com/randysimpson/ingestor), another option could be to use Wavefront or some other product.
 
@@ -205,8 +206,6 @@ spec:
       value: "SSM-1"
     - name: webhook
       value: "http://wfproxy:3878/"
-    - name: format
-      value: "f"
     - name: output
       value: "WF"
     securityContext:
@@ -230,7 +229,7 @@ If the out wire is connected to pin #15 - GPIO 22:
 *For docker to be able to access the GPIO pins the container must be run with the --privileged argument.*
 
 ```sh
-docker run -ti --privileged -e "pin=15" -e "type=SSM-1" -e "source=room" randysimpson/pi-iot:latest
+docker run -ti --privileged -e "pin=15" -e "type=HC-SR501" -e "source=room" randysimpson/pi-iot:latest
 ```
 
 #### Kubernetes
@@ -255,8 +254,6 @@ spec:
       value: "HC-SR501"
     - name: webhook
       value: "http://wfproxy:3878/"
-    - name: format
-      value: "f"
     - name: output
       value: "WF"
     securityContext:
@@ -303,8 +300,6 @@ spec:
       value: "SEO23"
     - name: webhook
       value: "http://wfproxy:3878/"
-    - name: format
-      value: "f"
     - name: output
       value: "WF"
     securityContext:
@@ -351,8 +346,56 @@ spec:
       value: "SEO53"
     - name: webhook
       value: "http://wfproxy:3878/"
-    - name: format
-      value: "f"
+    - name: output
+      value: "WF"
+    securityContext:
+      privileged: true
+  nodeSelector:
+    location: room
+```
+
+### Soil
+
+The [Soil Moisture and Water Sensor - YL-69 Sensor and HC-38](https://www.oowwic.top/index.php?main_page=product_info&products_id=815965) device can be connected to GPIO pin on Raspberry Pi 3.  The `pin` parameter must contain the pin number attached to the DO (Digital Output) pin.  The GND connects to ground and the VCC connects to +3 or +5.
+
+In the following image the brown wire is connected to 5 volts pin #2, the black wire is connected to pin #6 - ground, and the white wire is connected to pin #7 - GPIO 4.
+
+![Raspberry Pi YL-69 Wires](https://github.com/randysimpson/pi-iot/blob/master/images/pi-yl-69.PNG "Raspberry Pi YL-69 Wires")
+
+And when the pi is powered on there is a LED indicator for power, also sensitivity can be adjusted by rotating the screw.
+
+![YL-69 Soil Moisture Sensor](https://github.com/randysimpson/pi-iot/blob/master/images/yl-69.PNG "YL-69 Soil Moisture Sensor")
+
+#### Docker
+
+*For docker to be able to access the GPIO pins the container must be run with the --privileged argument.*
+
+```sh
+docker run -ti --privileged -e "pin=4" -e "type=YL-69" -e "source=plant" randysimpson/pi-iot:latest
+```
+
+#### Kubernetes
+
+To create a pod spec an example yaml file with a labeled node as `location=room` is given below:
+
+```json
+kind: Pod
+metadata:
+  name: pi-iot
+spec:
+  containers:
+  - name: pi-iot
+    image: randysimpson/pi-iot:latest
+    imagePullPolicy: IfNotPresent
+    env:
+    - name: pin
+      value: "4"
+    - name: source
+      value: "plant"
+    - name: type
+      value: "YL-69"
+    - name: webhook
+      value: "http://wfproxy:3878/"
     - name: output
       value: "WF"
     securityContext:
@@ -382,6 +425,9 @@ This field is for the type of sensor, default value is `HOST`.  Current possible
 * `HC-SRO`
 * `SSM-1`
 * `HC-SR501`
+* `SEO23`
+* `SEO53`
+* `YL-69`
 
 ##### -w or --webhook
 

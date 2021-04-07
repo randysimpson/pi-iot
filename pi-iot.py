@@ -49,6 +49,9 @@ def run(delay, sensor_type, pin, webhook, source, metric_prefix, output, format)
     elif sensor_type == 'SEO23':
         pin = int(pin)
         sensor = Generic(source, metric_prefix, output, sensor_type, pin, 'Tilt')
+    elif sensor_type == 'YL-69':
+        pin = int(pin)
+        sensor = Generic(source, metric_prefix, output, sensor_type, pin, 'Moisture')
     else:
         sensor = Host(source, metric_prefix, output)
         is_polling = True
