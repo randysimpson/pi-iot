@@ -12,6 +12,8 @@ This package can be used to get metrics from a Raspberry PI 3 device.  Current m
 
 To ingest these metrics there needs to be a webhook available by the IOT device.  To use an ingestor that uses a mongodb backend please see [Ingestor](https://github.com/randysimpson/ingestor), another option could be to use Wavefront or some other product.
 
+![Context Diagram](https://github.com/randysimpson/pi-iot/blob/master/images/context-diagram.PNG "Context Diagram")
+
 *Optional Wavefront Integration*
 
 *For this package to send metrics to [Wavefront](https://wavefront.com) there will need to be a Wavefront proxy installed on the network that the IOT device can send metrics to.  To send metrics in the Wavefront format set the `output` variable to `WF`*
