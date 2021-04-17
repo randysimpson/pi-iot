@@ -9,12 +9,22 @@ import sys, getopt
 import time
 import requests
 import os
+import logging
 from temp import Temp
 from host import Host
 from distance import Distance
 from generic import Generic
 from motion import Motion
-from aggregate import Aggregate
+from moisture import Moisture
+
+formatter = logging.Formatter(fmt='%(asctime)s - %(levelname)s - %(module)s - %(message)s')
+
+handler = logging.StreamHandler()
+handler.setFormatter(formatter)
+
+logger = logging.getLogger('root')
+logger.setLevel(os.environ.get("LOG_LEVEL", logging.ERROR))
+logger.addHandler(handler)
 
 def send_metrics(metrics, output, webhook, source):
     try:
@@ -25,7 +35,7 @@ def send_metrics(metrics, output, webhook, source):
         else:
             requests.post(webhook, json=metrics)
     except requests.exceptions.ConnectionError:
-        print('Connection error to webhook %s' % (webhook))
+        logger.error('Connection error to webhook %s' % (webhook))
 
 def run(delay, sensor_type, pin, webhook, source, metric_prefix, output, format):
     sensor = None
@@ -52,7 +62,7 @@ def run(delay, sensor_type, pin, webhook, source, metric_prefix, output, format)
         sensor = Generic(source, metric_prefix, output, sensor_type, pin, 'Tilt')
     elif sensor_type == 'YL-69':
         pin = int(pin)
-        sensor = Aggregate(source, metric_prefix, output, sensor_type, pin, 'Moisture', delay)
+        sensor = Moisture(source, metric_prefix, output, sensor_type, pin, 'Moisture', delay)
     else:
         sensor = Host(source, metric_prefix, output)
         is_polling = True
@@ -119,7 +129,7 @@ def main(argv):
           format = arg
       elif opt in ("-d", "--delay"):
           delay = arg
-   #print('pin is %d and type is %s and webhook is %s and source is %s' % (pin, iot_type, webhook, source))
+   logger.debug(f'pin is {pin} and type is {iot_type} and webhook is {webhook} and source is {source}')
    #check if source was setup.
    if len(source) < 1:
        source = os.popen('hostname').read().replace("\n", "")
