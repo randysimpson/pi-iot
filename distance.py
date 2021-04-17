@@ -72,7 +72,7 @@ class Distance(Sensor):
             if self.format == 'f':
                 distance = distance / 30.48
             if self.format == 'i':
-                distance = distance / 30.48 * 12;
+                distance = distance / 30.48 * 12
             self.metrics.append(Metric(name, distance, date))
 
     def format_metrics(self):

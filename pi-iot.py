@@ -14,6 +14,7 @@ from host import Host
 from distance import Distance
 from generic import Generic
 from motion import Motion
+from aggregate import Aggregate
 
 def send_metrics(metrics, output, webhook, source):
     try:
@@ -51,7 +52,7 @@ def run(delay, sensor_type, pin, webhook, source, metric_prefix, output, format)
         sensor = Generic(source, metric_prefix, output, sensor_type, pin, 'Tilt')
     elif sensor_type == 'YL-69':
         pin = int(pin)
-        sensor = Generic(source, metric_prefix, output, sensor_type, pin, 'Moisture')
+        sensor = Aggregate(source, metric_prefix, output, sensor_type, pin, 'Moisture', delay)
     else:
         sensor = Host(source, metric_prefix, output)
         is_polling = True
