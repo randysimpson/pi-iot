@@ -10,6 +10,9 @@ import datetime
 import sys
 import RPi.GPIO as GPIO
 import time
+import logging
+
+logger = logging.getLogger('root')
 
 class Motion(Sensor):
     def __init__(self, source, metric_prefix, output, code, pin):
@@ -34,14 +37,14 @@ class Motion(Sensor):
         GPIO.setup(self.pin, GPIO.IN)
 
         #allow pin to initialize
-        print("Initializing...")
+        logger.debug("Initializing...")
         time.sleep(60)
 
         #find initial pin value
         self.initial_value = GPIO.input(self.pin)
         self.last_change_time = time.time()
         self.in_motion = False
-        print("Ready")
+        logger.debug("Ready")
 
     def reset(self):
         #clean up first
