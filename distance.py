@@ -10,6 +10,9 @@ import datetime
 import sys
 import RPi.GPIO as GPIO
 import time
+import logging
+
+logger = logging.getLogger('root')
 
 class Distance(Sensor):
     def __init__(self, source, metric_prefix, output, code, pin_trigger, pin_echo, format):
@@ -60,7 +63,7 @@ class Distance(Sensor):
 
             distance = round(pulse_duration * 17150, 2)
         except Exception as e:
-            print(e)
+            logger.error(f'Error in distance: {e}')
             self.reset()
 
         if distance is not None:
