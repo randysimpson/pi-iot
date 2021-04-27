@@ -23,33 +23,34 @@ class Moisture(Generic):
     def __init__(self, source, metric_prefix, output, code, pin, metric_name, delay):
         Generic.__init__(self, source, metric_prefix, output, code, pin, metric_name)
         self.delay = delay
-        self.has_changed = False
+        self.change_count = 0
 
     def get_info(self):
         current_value = GPIO.input(self.pin)
         last_change_time = time.time()
         current_time = time.time()
+
         while current_value == self.initial_value:
             #do nothing, wait for a change
             current_value = GPIO.input(self.pin)
             time.sleep(0.00001)
             current_time = time.time()
+
             # this case is when the flapping stops inbetween delay
-            if self.has_changed and current_time - last_change_time > self.delay + 1:
-                self.metrics.append(Metric(self.name, 0.5, datetime.datetime.utcnow()))
+            if self.change_count > 0 and current_time - last_change_time > self.delay:
+                #send metric
+                val = 0.5 if self.change_count > 1 else current_value
+                self.metrics.append(Metric(self.name, val, datetime.datetime.utcnow()))
                 #reset past readings and set initial value so if it's at 0.5 it can be corrected to 0 or 1
-                self.has_changed = False
-                self.initial_value = 0.5
-                #set a delay to buffer then end result value
-                time.sleep(self.delay)
+                self.change_count = 0
+                self.initial_value = val
         # value changed
+        self.change_count += 1
+        self.initial_value = current_value
         if current_time - last_change_time > self.delay:
             #send metric
-            val = 0.5 if self.has_changed else current_value
+            val = 0.5 if self.change_count > 1 else current_value
             self.metrics.append(Metric(self.name, val, datetime.datetime.utcnow()))
             #reset time/past readings
-            last_change_time = current_time
-            self.has_changed = False
-        else:
-            self.has_changed = True
-        self.initial_value = current_value
+            self.change_count = 0
+            self.initial_value = val
