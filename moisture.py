@@ -23,34 +23,24 @@ class Moisture(Generic):
     def __init__(self, source, metric_prefix, output, code, pin, metric_name, delay):
         Generic.__init__(self, source, metric_prefix, output, code, pin, metric_name)
         self.delay = delay
-        self.change_count = 0
 
     def get_info(self):
-        current_value = GPIO.input(self.pin)
         last_change_time = time.time()
         current_time = time.time()
+        change_count = 0
 
-        while current_value == self.initial_value:
-            #do nothing, wait for a change
+        while current_time - last_change_time < self.delay:
+            #loop during time to see if any changes happen
             current_value = GPIO.input(self.pin)
             time.sleep(0.00001)
             current_time = time.time()
 
-            # this case is when the flapping stops inbetween delay
-            if self.change_count > 0 and current_time - last_change_time > self.delay:
-                #send metric
-                val = 0.5 if self.change_count > 1 else current_value
-                self.metrics.append(Metric(self.name, val, datetime.datetime.utcnow()))
-                #reset past readings and set initial value so if it's at 0.5 it can be corrected to 0 or 1
-                self.change_count = 0
-                self.initial_value = val
-        # value changed
-        self.change_count += 1
-        self.initial_value = current_value
-        if current_time - last_change_time > self.delay:
-            #send metric
-            val = 0.5 if self.change_count > 1 else current_value
+            if current_value != self.initial_value:
+                change_count += 1
+                self.initial_value = current_value
+
+        #delay time is up, send metric if necessary
+        if change_count > 0:
+            #send a value of 0.5 if there is flapping, otherwise send the current value
+            val = 0.5 if change_count > 1 else current_value
             self.metrics.append(Metric(self.name, val, datetime.datetime.utcnow()))
-            #reset time/past readings
-            self.change_count = 0
-            self.initial_value = val
